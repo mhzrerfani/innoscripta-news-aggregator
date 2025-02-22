@@ -1,48 +1,84 @@
+"use client"
+
 import { Suspense } from "react"
-import { getAllNews, getNewsSource } from "@/lib/services/news-service"
 import NewsCard from "./news-card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertTriangle } from "lucide-react"
+import { AlertTriangle, Loader2 } from "lucide-react"
+import { useInfiniteNews } from "@/hooks/use-news"
+import { usePreferences } from "@/hooks/use-preferences"
+import { InfiniteScroll } from "./infinite-scroll"
 import type { NewsFilters } from "@/lib/types"
+import { useSearchParams } from "next/navigation"
 
-export default async function NewsGrid({
-  source,
-  searchParams,
-}: {
-  source: string
-  searchParams?: { [key: string]: string }
-}) {
+function NewsContent({ source }: { source: string }) {
+  const searchParams = useSearchParams()
+  const { preferences, isLoaded } = usePreferences()
+
   const filters: NewsFilters = {
-    query: searchParams?.q,
-    category: searchParams?.category,
-    date: searchParams?.date,
-    sources: source === "all" ? undefined : [source],
+    query: searchParams.get("q") || undefined,
+    categories: preferences.categories,
+    date: searchParams.get("date") || undefined,
   }
 
-  const news = source === "all" ? await getAllNews(filters) : (await getNewsSource(source)?.fetchNews(filters)) || []
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useInfiniteNews(source, filters)
+
+  if (!isLoaded || isLoading) {
+    return <NewsGridSkeleton />
+  }
+
+  if (isError) {
+    return (
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>Failed to load news articles. Please try again later.</AlertDescription>
+      </Alert>
+    )
+  }
+
+  const articles = data?.pages.flatMap((page) => page.articles) || []
+
+  if (!articles.length) {
+    return (
+      <Alert>
+        <AlertTriangle className="h-4 w-4" />
+        <AlertDescription>
+          {filters.query
+            ? `No articles found for "${filters.query}". Try different search terms or filters.`
+            : "No articles found. Try adjusting your filters."}
+        </AlertDescription>
+      </Alert>
+    )
+  }
 
   return (
-    <Suspense fallback={<NewsGridSkeleton />}>
-      {news.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {news.map((article, index) => (
-            <NewsCard key={`${article.source}-${index}`} article={article} />
-          ))}
+    <>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {articles.map((article, index) => (
+          <NewsCard key={`${article.source}-${article.url}-${index}`} article={article} />
+        ))}
+      </div>
+      {isFetchingNextPage && (
+        <div className="mt-8 flex justify-center">
+          <Loader2 className="h-6 w-6 animate-spin" />
         </div>
-      ) : (
-        <Alert>
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>No articles found. Try adjusting your search filters.</AlertDescription>
-        </Alert>
       )}
+      <InfiniteScroll onLoadMore={() => fetchNextPage()} hasMore={!!hasNextPage} isLoading={isFetchingNextPage} />
+    </>
+  )
+}
+
+export default function NewsGrid({ source }: { source: string }) {
+  return (
+    <Suspense fallback={<NewsGridSkeleton />}>
+      <NewsContent source={source} />
     </Suspense>
   )
 }
 
 function NewsGridSkeleton() {
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="flex flex-col gap-4">
           <Skeleton className="h-48 w-full" />

@@ -1,49 +1,63 @@
-import type { Article, NewsFilters } from "@/lib/types"
-import { fetchWithRetry } from "@/lib/utils"
+import type { NewsFilters, NewsSource } from "@/lib/types"
 
-export async function getGuardianNews(filters?: NewsFilters): Promise<Article[]> {
-  try {
-    const params = new URLSearchParams({
-      "api-key": process.env.GUARDIAN_API_KEY || "",
-      "show-fields": "thumbnail,trailText",
-      "page-size": "20",
-    })
+export const guardianSource: NewsSource = {
+  id: "guardian",
+  name: "The Guardian",
 
-    if (filters?.query) {
-      params.append("q", filters.query)
+  async fetchNews(filters?: NewsFilters) {
+    try {
+      const params = new URLSearchParams({
+        "api-key": process.env.GUARDIAN_API_KEY || "",
+        "show-fields": "thumbnail,trailText",
+        "page-size": "30",
+      })
+
+      if (filters?.query) {
+        params.append("q", filters.query)
+      }
+
+      if (filters?.categories?.length) {
+        // Guardian uses sections for categories
+        const category = filters.categories[0].toLowerCase()
+        if (category !== "general") {
+          params.append("section", category)
+        }
+      }
+
+      if (filters?.date) {
+        params.append("from-date", new Date(filters.date).toISOString().split("T")[0])
+      }
+
+      const response = await fetch(`https://content.guardianapis.com/search?${params.toString()}`, {
+        next: { revalidate: 3600 },
+      })
+
+      if (!response.ok) {
+        console.error("Guardian API Error:", await response.text())
+        return { articles: [], hasMore: false, totalResults: 0 }
+      }
+
+      const data = await response.json()
+
+      const articles = data.response.results.map((article: any) => ({
+        title: article.webTitle,
+        description: article.fields?.trailText || "",
+        url: article.webUrl,
+        imageUrl: article.fields?.thumbnail || "/placeholder.svg?height=400&width=600",
+        source: "The Guardian",
+        publishedAt: article.webPublicationDate,
+        category: article.sectionName,
+      }))
+
+      return {
+        articles,
+        hasMore: data.response.currentPage < data.response.pages,
+        totalResults: data.response.total,
+      }
+    } catch (error) {
+      console.error("Error fetching Guardian news:", error)
+      return { articles: [], hasMore: false, totalResults: 0 }
     }
-
-    if (filters?.category && filters.category !== "All") {
-      params.append("section", filters.category.toLowerCase())
-    }
-
-    if (filters?.date) {
-      params.append("from-date", new Date(filters.date).toISOString().split("T")[0])
-    }
-
-    const response = await fetchWithRetry(`https://content.guardianapis.com/search?${params.toString()}`, {
-      next: { revalidate: 3600 },
-    })
-
-    if (!response.ok) {
-      console.error("Guardian API Error:", await response.text())
-      return []
-    }
-
-    const data = await response.json()
-
-    return data.response.results.map((article: any) => ({
-      title: article.webTitle,
-      description: article.fields.trailText,
-      url: article.webUrl,
-      imageUrl: article.fields.thumbnail,
-      source: "The Guardian",
-      publishedAt: article.webPublicationDate,
-      category: article.sectionName,
-    }))
-  } catch (error) {
-    console.error("Error fetching Guardian news:", error)
-    return []
-  }
+  },
 }
 

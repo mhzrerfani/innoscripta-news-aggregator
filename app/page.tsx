@@ -1,49 +1,31 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Newspaper } from "lucide-react"
-import NewsGrid from "@/components/news-grid"
 import SearchFilters from "@/components/search-filters"
-import PreferencesDialog from "@/components/preferences-dialog"
+import { PreferencesSidebar } from "@/components/preferences-sidebar"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { NewsTabs } from "@/components/news-tabs"
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b">
+      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Newspaper className="h-6 w-6" />
-              <h1 className="text-2xl font-bold">News Aggregator</h1>
+              <h1 className="text-xl font-bold sm:text-2xl">News Aggregator</h1>
             </div>
-            <PreferencesDialog />
+            <div className="flex items-center gap-2">
+              <PreferencesSidebar />
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto min-h-[calc(100vh-73px)] px-4 py-6">
         <SearchFilters />
-        <Tabs defaultValue="all" className="mt-6 w-full">
-          <TabsList className="w-full justify-start overflow-x-auto">
-            <TabsTrigger value="all">All Sources</TabsTrigger>
-            <TabsTrigger value="newsapi">NewsAPI</TabsTrigger>
-            <TabsTrigger value="guardian">The Guardian</TabsTrigger>
-            <TabsTrigger value="nyt">New York Times</TabsTrigger>
-            <TabsTrigger value="bbc">BBC News</TabsTrigger>
-          </TabsList>
-          <TabsContent value="all" className="mt-6">
-            <NewsGrid source="all" />
-          </TabsContent>
-          <TabsContent value="newsapi" className="mt-6">
-            <NewsGrid source="newsapi" />
-          </TabsContent>
-          <TabsContent value="guardian" className="mt-6">
-            <NewsGrid source="guardian" />
-          </TabsContent>
-          <TabsContent value="nyt" className="mt-6">
-            <NewsGrid source="nyt" />
-          </TabsContent>
-          <TabsContent value="bbc" className="mt-6">
-            <NewsGrid source="bbc" />
-          </TabsContent>
-        </Tabs>
+        <div className="mt-6">
+          <NewsTabs />
+        </div>
       </main>
     </div>
   )
