@@ -11,6 +11,10 @@ env:
 jobs:
   build-image:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      id-token: write
+      contents: read
     steps:
       # Setup
       - uses: actions/checkout@v4
