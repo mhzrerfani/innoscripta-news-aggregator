@@ -5,6 +5,8 @@ on: [push]
 env:
   APP_IMAGE: ghcr.io/mhzrerfani/innoscripta-news-aggregator
   GITHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+  NEWSAPI_KEY: ${{ secrets.NEWSAPI_KEY }}
+  GUARDIAN_API_KEY: ${{ secrets.GUARDIAN_API_KEY }}
 
 jobs:
   build-image:
