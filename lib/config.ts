@@ -6,7 +6,7 @@ export const config = {
     newsapi: {
       key: env.NEWSAPI_KEY,
       baseUrl: env.NEWSAPI_BASE_URL,
-      rateLimit: 100, // requests per day
+      rateLimit: 1000, // requests per day
       maxPages: 5, // max pages per request (free tier)
       domains: [
         "reuters.com",
@@ -20,7 +20,7 @@ export const config = {
         "apnews.com",
       ],
       categoryMap: {
-        general: ["news", "breaking", "world"],
+        general: ["news", "breaking", "world", "tech", "politics", "economy", "business", "finance", "entertainment", "culture", "health", "science", "sports"],
         business: ["business", "economy", "market", "finance", "trade"],
         culture: ["entertainment", "movie", "music", "celebrity", "culture"],
         wellness: ["health", "medical", "medicine", "healthcare"],

@@ -24,6 +24,12 @@ export const bbcSource: NewsSource = {
 
       const feedUrl = `${baseUrl}${feedPath}`;
 
+      if (filters?.date) {
+        const date = new Date(filters.date);
+        const dateStr = date.toISOString().split("T")[0];
+        feedPath = `${feedPath}?date=${dateStr}`;
+      }
+
       const response = await fetch(feedUrl, {
         next: { revalidate: 3600 },
       });

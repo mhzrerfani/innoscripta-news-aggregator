@@ -41,7 +41,7 @@ export default function NewsCard({ article }: { article: Article }) {
           </div>
           <div className="flex items-center text-sm text-muted-foreground mb-2">
             <CalendarIcon className="mr-1 h-4 w-4" />
-            {new Date(article.publishedAt).toLocaleDateString()}
+            {new Date(article.publishedAt).toLocaleDateString("en-US", { timeZone: "UTC" })}
           </div>
           <CardTitle className="line-clamp-2">{article.title}</CardTitle>
         </CardHeader>

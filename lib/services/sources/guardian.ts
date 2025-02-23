@@ -19,11 +19,10 @@ export const guardianSource: NewsSource = {
         params.append("q", filters.query);
       }
 
-      if (filters?.category) {
+      if (filters?.category && filters?.category !== 'general') {
         const category = guardianConfig.categoryMap[filters.category];
-        if (category) {
-          params.append("section", category);
-        }
+        params.append("section", category);
+
       }
 
       if (filters?.date) {

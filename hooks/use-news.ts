@@ -59,8 +59,18 @@ async function fetchNews(
 export function useInfiniteNews(
   filters?: Omit<NewsFilters, "page" | "pageSize">,
 ) {
+  const queryKey = ["news", filters?.source, filters?.category];
+
+  if (filters?.date) {
+    queryKey.push(filters.date);
+  }
+
+  if (filters?.query) {
+    queryKey.push(filters.query);
+  }
+
   return useInfiniteQuery({
-    queryKey: ["news", filters?.source, filters?.category, filters?.query],
+    queryKey,
     queryFn: ({ pageParam }) => fetchNews(filters, pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage, _, lastPageParam) =>

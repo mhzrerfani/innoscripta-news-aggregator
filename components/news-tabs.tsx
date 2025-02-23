@@ -16,11 +16,11 @@ function NewsTabsSection() {
     id: NewsSources;
     label: string;
   }[] = [
-    { id: "all", label: "All Sources" },
-    { id: "guardian", label: "The Guardian" },
-    { id: "bbc", label: "BBC News" },
-    { id: "newsapi", label: "NewsAPI" },
-  ];
+      { id: "all", label: "All Sources" },
+      { id: "guardian", label: "The Guardian" },
+      { id: "bbc", label: "BBC News" },
+      { id: "newsapi", label: "NewsAPI" },
+    ];
 
   if (!allSources.find((source) => source.id === currentSource)) {
     const params = new URLSearchParams(searchParams);
@@ -42,7 +42,7 @@ function NewsTabsSection() {
       onValueChange={handleTabChange}
       className="mb-6"
     >
-      <TabsList>
+      <TabsList className="overflow-x-auto">
         {allSources.map((source) => (
           <TabsTrigger key={source.id} value={source.id}>
             {source.label}

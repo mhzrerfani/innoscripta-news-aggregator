@@ -22,6 +22,7 @@ function SearchFiltersSection() {
   const searchParams = useSearchParams();
   const [isPending, setIsPending] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState(searchParams.get("q") ?? "");
   const queryClient = useQueryClient();
 
   const [date, setDate] = useState<Date | undefined>(() => {
@@ -57,92 +58,118 @@ function SearchFiltersSection() {
     setIsPending(false);
   };
 
-  const handleReset = () => {
+  const resetDate = () => {
+    const params = new URLSearchParams(searchParams);
     setDate(undefined);
+    params.delete("date");
+    router.push(`/?${params.toString()}`);
+  };
+
+  const handleReset = () => {
     setIsPending(true);
     const params = new URLSearchParams(searchParams);
     params.delete("q");
     params.delete("date");
+    setQuery("");
+    setDate(undefined);
     router.push(`/?${params.toString()}`);
     queryClient.invalidateQueries({ queryKey: ["news"] });
     setIsPending(false);
   };
 
-  const hasFilters = searchParams.get("q") || searchParams.get("date");
+  const hasFilters = query || searchParams.get("date");
 
   return (
     <form onSubmit={handleSearch} className="space-y-4">
-      <div className="flex gap-2">
+      <div className="flex gap-2 sm:flex-row flex-col">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             name="search"
             placeholder="Search news..."
             className="pl-9 pr-12"
-            defaultValue={searchParams.get("q") ?? ""}
+            onChange={(e) => setQuery(e.target.value)}
+            value={query}
           />
-          {searchParams.get("q") && (
+          {query && (
             <Button
               type="button"
               variant="ghost"
               size="sm"
               className="absolute right-2 top-1/2 h-7 w-7 -translate-y-1/2 p-0"
-              onClick={() => {
-                const params = new URLSearchParams(searchParams);
-                params.delete("q");
-                router.push(`/?${params.toString()}`);
-              }}
+              onClick={() => setQuery("")}
             >
               <X className="h-4 w-4" />
               <span className="sr-only">Clear search</span>
             </Button>
           )}
         </div>
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <Filter className="h-4 w-4" />
-              Filters
-              {date && (
-                <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                  {format(date, "MMM d, yyyy")}
-                </span>
-              )}
-            </Button>
-          </SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Search Filters</SheetTitle>
-            </SheetHeader>
-            <div className="mt-4 space-y-4">
-              <div className="space-y-2">
-                <h4 className="font-medium">Date</h4>
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  className="rounded-md border w-full max-w-[20rem]"
-                  disabled={(date) =>
-                    date > new Date() || date < new Date("2000-01-01")
-                  }
-                />
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
-        <Button type="submit" disabled={isPending}>
-          {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
-        </Button>
-        {hasFilters && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleReset}
-            disabled={isPending}
-          >
-            Reset
+        <div className="self-end flex gap-2 items-center">
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <Filter className="h-4 w-4" />
+                Filters
+                {date && (
+                  <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
+                    {format(date, "MMM d, yyyy")}
+                  </span>
+                )}
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Search Filters</SheetTitle>
+              </SheetHeader>
+              <form onSubmit={handleSearch} className="mt-4 space-y-4">
+                <div className="space-y-2">
+                  <h4 className="font-medium">Date</h4>
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    className="rounded-md border w-full max-w-[20rem]"
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("2000-01-01")
+                    }
+                  />
+                </div>
+                {date && <div className="flex gap-2">
+                  <Button type="submit" disabled={isPending} >
+                    {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={resetDate}
+                    disabled={isPending}
+                  >
+                    Reset
+                  </Button>
+                </div>
+                }
+
+
+              </form>
+            </SheetContent>
+          </Sheet>
+          <Button size={"sm"} type="submit" disabled={isPending}>
+            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
           </Button>
-        )}
+          {hasFilters && (
+            <Button
+              size={"sm"}
+              type="button"
+              variant="outline"
+              onClick={handleReset}
+              disabled={isPending}
+            >
+              Reset
+            </Button>
+          )}
+        </div>
+
       </div>
     </form>
   );
