@@ -39,6 +39,8 @@ cd news-aggregator
 
 2. Create a `.env.local` file with your API keys. Optionally, you can copy the `.env.example` file and rename it to `.env.local`:
 
+**NOTE:** If you use the pre-built image, API keys are provided for easier testing and you can skip providing your own API keys.
+
 ```plaintext
 NEWSAPI_KEY=your_newsapi_key
 GUARDIAN_API_KEY=your_guardian_key
