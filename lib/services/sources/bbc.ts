@@ -8,19 +8,19 @@ export const bbcSource: NewsSource = {
 
   async fetchNews(filters?: NewsFilters) {
     try {
-      const baseUrl = config.bbc.baseUrl
-      const feeds = config.bbc.categoryMap
+      const baseUrl = config.bbc.baseUrl;
+      const feeds = config.bbc.categoryMap;
 
-      let feedPath: string = feeds.general as string
+      let feedPath: string = feeds.general as string;
       if (filters?.category) {
         const category = filters.category as Category;
 
         if (feeds[category]) {
-          feedPath = feeds[category]
+          feedPath = feeds[category];
         }
       }
 
-      const feedUrl = `${baseUrl}${feedPath}`
+      const feedUrl = `${baseUrl}${feedPath}`;
 
       const response = await fetch(feedUrl, {
         next: { revalidate: 3600 },
@@ -38,7 +38,7 @@ export const bbcSource: NewsSource = {
       const data: RSSFeed = parser.parse(xml);
 
       const articles = data.rss.channel.item.map((article) => {
-        const thumbnail = article["media:thumbnail"]?.["@_url"]
+        const thumbnail = article["media:thumbnail"]?.["@_url"];
 
         return {
           title: article.title,

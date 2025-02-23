@@ -18,17 +18,17 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Category } from "@/lib/config";
 
-export const availableCategories: Array<{ name: Category, icon: LucideIcon }> = [
-  { name: "general", icon: Newspaper },
-  { name: "business", icon: Briefcase },
-  { name: "culture", icon: Film },
-  { name: "wellness", icon: Heart },
-  { name: "science", icon: Flask },
-  { name: "sport", icon: Football },
-  { name: "technology", icon: Cpu },
-  { name: "world", icon: Globe },
-] as const;
-
+export const availableCategories: Array<{ name: Category; icon: LucideIcon }> =
+  [
+    { name: "general", icon: Newspaper },
+    { name: "business", icon: Briefcase },
+    { name: "culture", icon: Film },
+    { name: "wellness", icon: Heart },
+    { name: "science", icon: Flask },
+    { name: "sport", icon: Football },
+    { name: "technology", icon: Cpu },
+    { name: "world", icon: Globe },
+  ] as const;
 
 function CategoryFiltersSection() {
   const router = useRouter();
@@ -62,7 +62,7 @@ function CategoryFiltersSection() {
             key={category.name}
             variant={
               currentCategory === category.name ||
-                (!currentCategory && category.name === "general")
+              (!currentCategory && category.name === "general")
                 ? "default"
                 : "outline"
             }

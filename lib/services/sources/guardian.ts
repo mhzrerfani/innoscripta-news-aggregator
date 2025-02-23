@@ -18,7 +18,8 @@ export const guardianSource: NewsSource = {
       }
 
       if (filters?.category) {
-        const category = config.guardian.categoryMap[filters.category as Category];
+        const category =
+          config.guardian.categoryMap[filters.category as Category];
         if (category) {
           params.append("section", category);
         }
@@ -52,8 +53,7 @@ export const guardianSource: NewsSource = {
         title: article.webTitle,
         description: article.fields?.trailText,
         url: article.webUrl,
-        imageUrl:
-          article.fields?.thumbnail,
+        imageUrl: article.fields?.thumbnail,
         source: "The Guardian",
         publishedAt: article.webPublicationDate,
         category: article.sectionName,

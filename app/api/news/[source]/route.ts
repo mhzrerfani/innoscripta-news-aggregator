@@ -11,7 +11,7 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const filters: NewsFilters = {
       query: searchParams.get("q") || undefined,
-      category: searchParams.get("category") as Category || undefined,
+      category: (searchParams.get("category") as Category) || undefined,
       date: searchParams.get("date") || undefined,
       page: Number.parseInt(searchParams.get("page") || "1"),
       pageSize: Number.parseInt(searchParams.get("pageSize") || "12"),

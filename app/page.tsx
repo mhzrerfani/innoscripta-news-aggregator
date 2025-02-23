@@ -7,7 +7,8 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Innoscripta News Aggregator",
-  description: "A news aggregator that fetches news articles from various sources.",
+  description:
+    "A news aggregator that fetches news articles from various sources.",
 };
 
 export default function Home() {

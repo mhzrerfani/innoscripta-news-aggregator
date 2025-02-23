@@ -42,10 +42,7 @@ export const newsApiSource: NewsSource = {
         params.append("to", `${dateStr}T23:59:59Z`);
       }
 
-      params.append(
-        "domains",
-        config.newsapi.domains.join(","),
-      );
+      params.append("domains", config.newsapi.domains.join(","));
 
       console.log("NewsAPI Request:", {
         url: baseUrl,
@@ -107,8 +104,7 @@ export const newsApiSource: NewsSource = {
           title: article.title,
           description: article.description,
           url: article.url,
-          imageUrl:
-            article.urlToImage,
+          imageUrl: article.urlToImage,
           source: article.source.name || "NewsAPI",
           publishedAt: article.publishedAt,
           category: filters?.category,
