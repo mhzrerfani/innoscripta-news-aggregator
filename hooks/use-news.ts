@@ -17,16 +17,8 @@ async function fetchNews(source: string, filters?: NewsFilters, pageParam = 1): 
       params.set("q", filters.query)
     }
 
-    if (filters?.categories?.length) {
-      filters.categories.forEach((category) => {
-        params.append("categories[]", category)
-      })
-    }
-
-    if (filters?.sources?.length) {
-      filters.sources.forEach((source) => {
-        params.append("sources[]", source)
-      })
+    if (filters?.category) {
+      params.set("category", filters.category)
     }
 
     if (filters?.date) {
@@ -71,7 +63,6 @@ export function useInfiniteNews(source: string, filters?: Omit<NewsFilters, "pag
     initialPageParam: 1,
     getNextPageParam: (lastPage, _, lastPageParam) => (lastPage.hasMore ? lastPageParam + 1 : undefined),
     getPreviousPageParam: (_, __, firstPageParam) => (firstPageParam > 1 ? firstPageParam - 1 : undefined),
-    retry: 2,
   })
 }
 

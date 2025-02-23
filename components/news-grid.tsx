@@ -6,24 +6,22 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertTriangle, Loader2 } from "lucide-react"
 import { useInfiniteNews } from "@/hooks/use-news"
-import { usePreferences } from "@/hooks/use-preferences"
 import { InfiniteScroll } from "./infinite-scroll"
 import type { NewsFilters } from "@/lib/types"
 import { useSearchParams } from "next/navigation"
 
 function NewsContent({ source }: { source: string }) {
   const searchParams = useSearchParams()
-  const { preferences, isLoaded } = usePreferences()
 
   const filters: NewsFilters = {
     query: searchParams.get("q") || undefined,
-    categories: preferences.categories,
+    category: searchParams.get("category") ?? undefined,
     date: searchParams.get("date") || undefined,
   }
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useInfiniteNews(source, filters)
 
-  if (!isLoaded || isLoading) {
+  if (isLoading) {
     return <NewsGridSkeleton />
   }
 

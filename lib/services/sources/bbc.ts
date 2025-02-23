@@ -1,5 +1,5 @@
 import { XMLParser } from "fast-xml-parser"
-import type { NewsFilters, NewsSource } from "@/lib/types"
+import type { NewsFilters, NewsSource, RSSFeed } from "@/lib/types"
 
 export const bbcSource: NewsSource = {
   id: "bbc",
@@ -7,22 +7,20 @@ export const bbcSource: NewsSource = {
 
   async fetchNews(filters?: NewsFilters) {
     try {
-      // BBC RSS feeds for different categories
       const feedUrls = {
         general: "https://feeds.bbci.co.uk/news/rss.xml",
         world: "https://feeds.bbci.co.uk/news/world/rss.xml",
         technology: "https://feeds.bbci.co.uk/news/technology/rss.xml",
         business: "https://feeds.bbci.co.uk/news/business/rss.xml",
-        entertainment: "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml",
-        health: "https://feeds.bbci.co.uk/news/health/rss.xml",
+        culture: "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml",
+        wellness: "https://feeds.bbci.co.uk/news/health/rss.xml",
         science: "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml",
-        sports: "https://feeds.bbci.co.uk/sport/rss.xml",
+        sport: "https://feeds.bbci.co.uk/sport/rss.xml",
       }
 
-      // Determine which feed to use based on category
       let feedUrl = feedUrls.general
-      if (filters?.categories?.length) {
-        const category = filters.categories[0].toLowerCase()
+      if (filters?.category) {
+        const category = filters.category.toLowerCase()
         if (feedUrls[category as keyof typeof feedUrls]) {
           feedUrl = feedUrls[category as keyof typeof feedUrls]
         }
@@ -41,13 +39,12 @@ export const bbcSource: NewsSource = {
         ignoreAttributes: false,
         attributeNamePrefix: "@_",
       })
-      const data = parser.parse(xml)
+      const data: RSSFeed = parser.parse(xml)
 
-      let articles = data.rss.channel.item.map((article: any) => {
-        // Extract the first media:thumbnail URL if it exists
-        const thumbnail = article["media:thumbnail"]?.[0]?.["@_url"] || 
-                         article["media:thumbnail"]?.["@_url"] ||
-                         "/placeholder.svg?height=400&width=600"
+      let articles = data.rss.channel.item.map((article) => {
+        const thumbnail = article["media:thumbnail"]?.["@_url"] ||
+          article["media:thumbnail"]?.["@_url"] ||
+          "/placeholder.svg?height=400&width=600"
 
         return {
           title: article.title,
@@ -56,11 +53,10 @@ export const bbcSource: NewsSource = {
           imageUrl: thumbnail,
           source: "BBC News",
           publishedAt: article.pubDate,
-          category: this.mapCategory(article.category || "General"),
+          category: data.rss.channel.description.split(" - ")[1],
         }
       })
 
-      // Apply filters
       if (filters?.query) {
         const query = filters.query.toLowerCase()
         articles = articles.filter(
@@ -77,14 +73,13 @@ export const bbcSource: NewsSource = {
         )
       }
 
-      // Ensure we have an array
       if (!Array.isArray(articles)) {
         articles = [articles].filter(Boolean)
       }
 
       return {
         articles,
-        hasMore: false, // RSS feeds don't support pagination
+        hasMore: false,
         totalResults: articles.length,
       }
     } catch (error) {
@@ -92,19 +87,5 @@ export const bbcSource: NewsSource = {
       return { articles: [], hasMore: false, totalResults: 0 }
     }
   },
-
-  private mapCategory(category: string): string {
-    const categoryMap: { [key: string]: string } = {
-      "Technology": "Technology",
-      "Business": "Business",
-      "Entertainment & Arts": "Entertainment",
-      "Health": "Health",
-      "Science & Environment": "Science",
-      "Sport": "Sports",
-      "World": "World",
-    }
-
-    return categoryMap[category] || "General"
-  }
 }
 

@@ -6,83 +6,76 @@ export const newsApiSource: NewsSource = {
 
   async fetchNews(filters?: NewsFilters) {
     try {
+      const pageSize = 12
+      const currentPage = filters?.page || 1
+
       const params = new URLSearchParams({
         apiKey: process.env.NEWSAPI_KEY || "",
         language: "en",
-        pageSize: "30",
-        page: (filters?.page || 1).toString(),
+        pageSize: pageSize.toString(),
+        page: currentPage.toString(),
       })
 
-      // Use top-headlines for better results
-      let baseUrl = "https://newsapi.org/v2/top-headlines"
-      params.append("country", "us") // Default to US news
+      const baseUrl = "https://newsapi.org/v2/everything"
 
-      // Switch to everything endpoint for search queries
+      const queryParts: string[] = []
+
       if (filters?.query) {
-        baseUrl = "https://newsapi.org/v2/everything"
-        params.delete("country")
-        params.append("q", filters.query)
-        params.append("sortBy", "publishedAt")
+        queryParts.push(`(${filters.query})`)
       }
 
-      // Handle categories for top-headlines
-      if (filters?.categories?.length && baseUrl.includes("top-headlines")) {
-        const category = filters.categories[0]?.toLowerCase()
-        if (category && category !== "general") {
-          params.append("category", category)
+      if (filters?.category && filters.category !== "General") {
+        const categoryMap: { [key: string]: string[] } = {
+          Business: ["business", "economy", "market", "finance", "trade"],
+          Culture: ["entertainment", "movie", "music", "celebrity", "culture"],
+          Wellness: ["health", "medical", "medicine", "healthcare"],
+          Science: ["science", "research", "discovery", "space"],
+          Sport: ["sport", "sports", "game", "match", "tournament"],
+          Technology: ["tech", "technology", "digital", "software", "cyber"],
+          World: ["world", "international", "global", "foreign"],
+        }
+
+        const categoryKeywords = categoryMap[filters.category]
+        if (categoryKeywords) {
+          queryParts.push(`(${categoryKeywords.join(" OR ")})`)
         }
       }
 
-      // Handle categories for everything endpoint
-      if (filters?.categories?.length && baseUrl.includes("everything")) {
-        const categoryQuery = filters.categories.map((cat) => `"${cat.toLowerCase()}"`).join(" OR ")
-        const currentQuery = params.get("q") || ""
-        params.set("q", currentQuery ? `${currentQuery} AND (${categoryQuery})` : categoryQuery)
+      if (queryParts.length === 0) {
+        queryParts.push("(world OR news OR breaking)")
       }
 
-      // Handle sources
-      if (filters?.sources?.length) {
-        const domains = filters.sources
-          .map((source) => {
-            switch (source) {
-              case "reuters":
-                return "reuters.com"
-              case "bloomberg":
-                return "bloomberg.com"
-              case "business-insider":
-                return "businessinsider.com"
-              case "techcrunch":
-                return "techcrunch.com"
-              case "the-verge":
-                return "theverge.com"
-              case "wired":
-                return "wired.com"
-              case "cnn":
-                return "cnn.com"
-              case "bbc-news":
-                return "bbc.com"
-              case "associated-press":
-                return "apnews.com"
-              case "the-guardian":
-                return "theguardian.com"
-              case "the-washington-post":
-                return "washingtonpost.com"
-              case "wall-street-journal":
-                return "wsj.com"
-              default:
-                return null
-            }
-          })
-          .filter(Boolean)
+      params.append("q", queryParts.join(" AND "))
+      params.append("sortBy", "publishedAt")
 
-        if (domains.length > 0 && baseUrl.includes("everything")) {
-          params.append("domains", domains.join(","))
-        }
+      if (filters?.date) {
+        const selectedDate = new Date(filters.date)
+        const dateStr = selectedDate.toISOString().split("T")[0]
+        params.append("from", `${dateStr}T00:00:00Z`)
+        params.append("to", `${dateStr}T23:59:59Z`)
       }
+
+      params.append(
+        "domains",
+        [
+          "reuters.com",
+          "bloomberg.com",
+          "businessinsider.com",
+          "techcrunch.com",
+          "theverge.com",
+          "wired.com",
+          "cnn.com",
+          "bbc.com",
+          "apnews.com",
+        ].join(","),
+      )
 
       console.log("NewsAPI Request:", {
         url: baseUrl,
         params: params.toString(),
+        query: queryParts,
+        page: currentPage,
+        pageSize,
       })
 
       const response = await fetch(`${baseUrl}?${params.toString()}`, {
@@ -93,8 +86,7 @@ export const newsApiSource: NewsSource = {
       })
 
       if (response.status === 429) {
-        console.warn("NewsAPI rate limit reached")
-        return { articles: [], hasMore: false, totalResults: 0 }
+        throw new Error("NewsAPI rate limit exceeded")
       }
 
       if (!response.ok) {
@@ -116,108 +108,58 @@ export const newsApiSource: NewsSource = {
         throw new Error(`NewsAPI returned status: ${data.status}`)
       }
 
-      const articles = data.articles
+      let articles = data.articles
         .filter((article) => {
-          if (!article.title || !article.description) {
-            console.warn("Skipping article with missing fields:", article)
+          if (!article.title || !article.description || !article.publishedAt) {
             return false
           }
+
+          if (filters?.date) {
+            const articleDate = new Date(article.publishedAt).toDateString()
+            const filterDate = new Date(filters.date).toDateString()
+            if (articleDate !== filterDate) {
+              return false
+            }
+          }
+
+          if (filters?.query) {
+            const searchLower = filters.query.toLowerCase()
+            const titleLower = article.title.toLowerCase()
+            const descLower = article.description.toLowerCase()
+            if (!titleLower.includes(searchLower) && !descLower.includes(searchLower)) {
+              return false
+            }
+          }
+
           return true
         })
-        .map((article) => {
-          // Extract source from URL
-          const sourceDomain = new URL(article.url).hostname
-          const sourceId = Object.entries({
-            reuters: "reuters.com",
-            bloomberg: "bloomberg.com",
-            "business-insider": "businessinsider.com",
-            techcrunch: "techcrunch.com",
-            "the-verge": "theverge.com",
-            wired: "wired.com",
-            cnn: "cnn.com",
-            "bbc-news": "bbc.com",
-            "associated-press": "apnews.com",
-            "the-guardian": "theguardian.com",
-            "the-washington-post": "washingtonpost.com",
-            "wall-street-journal": "wsj.com",
-          }).find(([_, domain]) => sourceDomain.includes(domain.split(".")[0]))?.[0]
+        .map((article) => ({
+          title: article.title,
+          description: article.description,
+          url: article.url,
+          imageUrl: article.urlToImage || "/placeholder.svg?height=400&width=600",
+          source: article.source.name || "NewsAPI",
+          publishedAt: article.publishedAt,
+          category: filters?.category,
+        }))
 
-          return {
-            title: article.title,
-            description: article.description,
-            url: article.url,
-            imageUrl: article.urlToImage || "/placeholder.svg?height=400&width=600",
-            source: article.source.name || sourceId || "NewsAPI",
-            sourceId: sourceId || article.source.id || "unknown",
-            publishedAt: article.publishedAt,
-            category: detectCategory(article.title + " " + article.description, filters?.categories),
-          }
-        })
+      articles = articles.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
 
-      const totalPages = Math.ceil(data.totalResults / 30)
-      const currentPage = filters?.page || 1
-
-      console.log("NewsAPI Response:", {
-        totalArticles: articles.length,
-        totalResults: data.totalResults,
-        currentPage,
-        totalPages,
-      })
+      const totalResults = Math.min(data.totalResults, 100)
+      const totalPages = Math.ceil(totalResults / pageSize)
+      const hasMore = currentPage < totalPages && currentPage < 5
 
       return {
         articles,
-        hasMore: currentPage < totalPages && currentPage < 5, // NewsAPI free tier limit
-        totalResults: Math.min(data.totalResults, 150), // NewsAPI free tier limit
+        hasMore,
+        totalResults,
         currentPage,
-        totalPages: Math.min(totalPages, 5), // NewsAPI free tier limit
+        totalPages: Math.min(totalPages, 5),
       }
     } catch (error) {
       console.error("Error fetching NewsAPI articles:", error)
-      throw error
+      return { articles: [], hasMore: false, totalResults: 0 }
     }
   },
-}
-
-function detectCategory(content: string, preferredCategories?: string[]): string {
-  const categoryKeywords: { [key: string]: string[] } = {
-    Technology: ["tech", "technology", "software", "ai", "digital", "cyber", "app", "computer", "internet", "mobile"],
-    Business: ["business", "economy", "market", "finance", "stock", "trade", "company", "industry", "startup"],
-    Entertainment: ["entertainment", "movie", "music", "celebrity", "film", "art", "show", "actor", "tv", "hollywood"],
-    Health: ["health", "medical", "covid", "disease", "wellness", "healthcare", "doctor", "hospital", "medicine"],
-    Science: ["science", "research", "study", "discovery", "space", "climate", "environment", "scientist", "lab"],
-    Sports: [
-      "sport",
-      "football",
-      "basketball",
-      "soccer",
-      "game",
-      "player",
-      "team",
-      "match",
-      "tournament",
-      "championship",
-    ],
-    World: ["world", "global", "international", "country", "nation", "foreign", "europe", "asia", "america", "africa"],
-  }
-
-  const contentLower = content.toLowerCase()
-
-  // If preferred categories are provided, check them first
-  if (preferredCategories?.length) {
-    for (const category of preferredCategories) {
-      if (category === "General") continue
-      const keywords = categoryKeywords[category as keyof typeof categoryKeywords]
-      if (keywords?.some((keyword) => contentLower.includes(keyword))) {
-        return category
-      }
-    }
-  }
-
-  // Check all categories if no match found in preferred categories
-  const matchedCategories = Object.entries(categoryKeywords)
-    .filter(([_, keywords]) => keywords.some((keyword) => contentLower.includes(keyword)))
-    .map(([category]) => category)
-
-  return matchedCategories[0] || "General"
 }
 

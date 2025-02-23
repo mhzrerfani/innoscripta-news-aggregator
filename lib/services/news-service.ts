@@ -18,7 +18,6 @@ export class NewsAggregatorService {
     try {
       console.log("Fetching news with filters:", filters)
 
-      // If a specific source is requested, only use that source
       if (filters?.source && this.sources[filters.source]) {
         const result = await this.sources[filters.source].fetchNews(filters)
         return {
@@ -28,7 +27,6 @@ export class NewsAggregatorService {
         }
       }
 
-      // Otherwise, fetch from all enabled sources
       const enabledSources = Object.values(this.sources)
 
       const results = await Promise.allSettled(
@@ -110,13 +108,6 @@ export class NewsAggregatorService {
 
   private applyFilters(articles: Article[], filters: NewsFilters): Article[] {
     let filtered = articles
-
-    if (filters.categories?.length) {
-      filtered = filtered.filter(
-        (article) =>
-          article.category && filters.categories?.some((cat) => article.category?.toLowerCase() === cat.toLowerCase()),
-      )
-    }
 
     if (filters.date) {
       const filterDate = new Date(filters.date).toDateString()

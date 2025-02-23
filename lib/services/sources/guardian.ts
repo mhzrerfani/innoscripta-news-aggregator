@@ -1,4 +1,4 @@
-import type { NewsFilters, NewsSource } from "@/lib/types"
+import type { GuardianApiResponse, NewsFilters, NewsSource } from "@/lib/types"
 
 export const guardianSource: NewsSource = {
   id: "guardian",
@@ -16,16 +16,21 @@ export const guardianSource: NewsSource = {
         params.append("q", filters.query)
       }
 
-      if (filters?.categories?.length) {
-        // Guardian uses sections for categories
-        const category = filters.categories[0].toLowerCase()
+      if (filters?.category) {
+        const category = filters.category.toLowerCase()
         if (category !== "general") {
           params.append("section", category)
         }
       }
 
       if (filters?.date) {
-        params.append("from-date", new Date(filters.date).toISOString().split("T")[0])
+        const selectedDate = new Date(filters.date)
+        const dateStr = selectedDate.toISOString().split("T")[0]
+        params.append("from-date", dateStr)
+        params.append("order-by", "oldest")
+        const nextDay = new Date(selectedDate)
+        nextDay.setDate(nextDay.getDate() + 1)
+        params.append("to-date", nextDay.toISOString().split("T")[0])
       }
 
       const response = await fetch(`https://content.guardianapis.com/search?${params.toString()}`, {
@@ -37,9 +42,9 @@ export const guardianSource: NewsSource = {
         return { articles: [], hasMore: false, totalResults: 0 }
       }
 
-      const data = await response.json()
+      const data: GuardianApiResponse = await response.json()
 
-      const articles = data.response.results.map((article: any) => ({
+      const articles = data.response.results.map((article) => ({
         title: article.webTitle,
         description: article.fields?.trailText || "",
         url: article.webUrl,

@@ -7,7 +7,7 @@ export async function GET(request: NextRequest, { params }: { params: { source: 
     const { searchParams } = new URL(request.url)
     const filters: NewsFilters = {
       query: searchParams.get("q") || undefined,
-      categories: searchParams.get("category")?.split(",") || undefined,
+      category: searchParams.get("category") || undefined,
       date: searchParams.get("date") || undefined,
       page: Number.parseInt(searchParams.get("page") || "1"),
       pageSize: Number.parseInt(searchParams.get("pageSize") || "12"),

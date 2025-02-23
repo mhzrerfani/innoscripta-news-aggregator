@@ -8,7 +8,7 @@ interface InfiniteScrollProps {
   onLoadMore: () => void
   hasMore: boolean
   isLoading: boolean
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 
 export function InfiniteScroll({ onLoadMore, hasMore, isLoading, children }: InfiniteScrollProps) {

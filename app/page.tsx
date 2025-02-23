@@ -1,8 +1,8 @@
 import { Newspaper } from "lucide-react"
 import SearchFilters from "@/components/search-filters"
-import { PreferencesSidebar } from "@/components/preferences-sidebar"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { NewsTabs } from "@/components/news-tabs"
+import { CategoryFilters } from "@/components/category-filters"
 
 export default function Home() {
   return (
@@ -11,11 +11,10 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <Newspaper className="h-6 w-6" />
-              <h1 className="text-xl font-bold sm:text-2xl">News Aggregator</h1>
+              <Newspaper className="h-6 w-6 " />
+              <h1 className="text-xl sm:text-2xl">News Aggregator</h1>
             </div>
             <div className="flex items-center gap-2">
-              <PreferencesSidebar />
               <ThemeToggle />
             </div>
           </div>
@@ -24,7 +23,10 @@ export default function Home() {
       <main className="container mx-auto min-h-[calc(100vh-73px)] px-4 py-6">
         <SearchFilters />
         <div className="mt-6">
-          <NewsTabs />
+          <CategoryFilters />
+          <div className="mt-4">
+            <NewsTabs />
+          </div>
         </div>
       </main>
     </div>
