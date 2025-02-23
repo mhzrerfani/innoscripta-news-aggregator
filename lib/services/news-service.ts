@@ -16,8 +16,6 @@ export class NewsAggregatorService {
 
   async getAllNews(filters?: NewsFilters) {
     try {
-      console.log("Fetching news with filters:", filters);
-
       if (filters?.source && this.sources[filters.source]) {
         const result = await this.sources[filters.source].fetchNews(filters);
         return {
@@ -64,7 +62,6 @@ export class NewsAggregatorService {
         }
       });
 
-      console.log(`Fetched ${allArticles.length} articles total`);
       if (errors.length > 0) {
         console.warn(
           `Encountered ${errors.length} errors while fetching:`,

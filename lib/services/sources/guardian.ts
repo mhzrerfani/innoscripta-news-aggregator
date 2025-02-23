@@ -1,6 +1,8 @@
 import { Category, config } from "@/lib/config";
 import type { GuardianApiResponse, NewsFilters, NewsSource } from "@/lib/types";
 
+const guardianConfig = config.sources.guardian;
+
 export const guardianSource: NewsSource = {
   id: "guardian",
   name: "The Guardian",
@@ -8,7 +10,7 @@ export const guardianSource: NewsSource = {
   async fetchNews(filters?: NewsFilters) {
     try {
       const params = new URLSearchParams({
-        "api-key": config.guardian.key || "",
+        "api-key": guardianConfig.key,
         "show-fields": "thumbnail,trailText",
         "page-size": "30",
       });
@@ -19,7 +21,7 @@ export const guardianSource: NewsSource = {
 
       if (filters?.category) {
         const category =
-          config.guardian.categoryMap[filters.category as Category];
+          guardianConfig.categoryMap[filters.category as Category];
         if (category) {
           params.append("section", category);
         }
@@ -36,7 +38,7 @@ export const guardianSource: NewsSource = {
       }
 
       const response = await fetch(
-        `${config.guardian.baseUrl}/search?${params.toString()}`,
+        `${guardianConfig.baseUrl}/search?${params.toString()}`,
         {
           next: { revalidate: 3600 },
         },

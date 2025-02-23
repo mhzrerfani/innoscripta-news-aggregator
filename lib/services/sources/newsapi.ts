@@ -1,6 +1,8 @@
 import { config } from "@/lib/config";
 import type { NewsFilters, NewsApiResponse, NewsSource } from "@/lib/types";
 
+const newsApiConfig = config.sources.newsapi;
+
 export const newsApiSource: NewsSource = {
   id: "newsapi",
   name: "NewsAPI",
@@ -11,13 +13,13 @@ export const newsApiSource: NewsSource = {
       const currentPage = filters?.page || 1;
 
       const params = new URLSearchParams({
-        apiKey: config.newsapi.key || "",
-        language: config.newsapi.language,
+        apiKey: newsApiConfig.key,
+        language: newsApiConfig.language,
         pageSize: pageSize.toString(),
         page: currentPage.toString(),
       });
 
-      const baseUrl = `${config.newsapi.baseUrl}/everything`;
+      const baseUrl = `${newsApiConfig.baseUrl}/everything`;
 
       const queryParts: string[] = [];
 
@@ -26,7 +28,7 @@ export const newsApiSource: NewsSource = {
       }
 
       if (filters?.category) {
-        const categoryKeywords = config.newsapi.categoryMap[filters.category];
+        const categoryKeywords = newsApiConfig.categoryMap[filters.category];
         if (categoryKeywords) {
           queryParts.push(`(${categoryKeywords.join(" OR ")})`);
         }
@@ -42,7 +44,7 @@ export const newsApiSource: NewsSource = {
         params.append("to", `${dateStr}T23:59:59Z`);
       }
 
-      params.append("domains", config.newsapi.domains.join(","));
+      params.append("domains", newsApiConfig.domains.join(","));
 
       console.log("NewsAPI Request:", {
         url: baseUrl,
@@ -55,7 +57,7 @@ export const newsApiSource: NewsSource = {
       const response = await fetch(`${baseUrl}?${params.toString()}`, {
         next: { revalidate: 300 },
         headers: {
-          "X-Api-Key": process.env.NEWSAPI_KEY || "",
+          "X-Api-Key": newsApiConfig.key,
         },
       });
 
@@ -85,21 +87,10 @@ export const newsApiSource: NewsSource = {
       }
 
       const articles = data.articles
-        .filter((article) => {
-          if (!article.title || !article.description || !article.publishedAt) {
-            return false;
-          }
-
-          if (filters?.date) {
-            const articleDate = new Date(article.publishedAt).toDateString();
-            const filterDate = new Date(filters.date).toDateString();
-            if (articleDate !== filterDate) {
-              return false;
-            }
-          }
-
-          return true;
-        })
+        .filter(
+          (article) =>
+            !(!article.title || !article.description || !article.publishedAt),
+        )
         .map((article) => ({
           title: article.title,
           description: article.description,

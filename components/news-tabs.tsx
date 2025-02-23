@@ -4,20 +4,23 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NewsGrid from "./news-grid";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Suspense } from "react";
+import { config } from "@/lib/config";
 
 function NewsTabsSection() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-
   const currentSource = searchParams.get("source") || "all";
 
-  const allSources = [
-    { id: "all", label: "All Sources" },
-    { id: "newsapi", label: "NewsAPI" },
-    { id: "guardian", label: "The Guardian" },
-    { id: "bbc", label: "BBC News" },
-  ];
+  const newsSources: {
+    id: keyof typeof config.sources, label: string
+  }[] = [
+      { id: "guardian", label: "The Guardian" },
+      { id: "bbc", label: "BBC News" },
+      { id: "newsapi", label: "NewsAPI" },
+    ];
+
+  const allSources = [{ id: "all", label: "All Sources" }, ...newsSources];
 
   if (!allSources.find((source) => source.id === currentSource)) {
     const params = new URLSearchParams(searchParams);

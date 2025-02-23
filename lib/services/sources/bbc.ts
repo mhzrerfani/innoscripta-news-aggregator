@@ -2,14 +2,16 @@ import { XMLParser } from "fast-xml-parser";
 import type { NewsFilters, NewsSource, RSSFeed } from "@/lib/types";
 import { Category, config } from "@/lib/config";
 
+const bbcConfig = config.sources.bbc;
+
 export const bbcSource: NewsSource = {
   id: "bbc",
   name: "BBC News",
 
   async fetchNews(filters?: NewsFilters) {
     try {
-      const baseUrl = config.bbc.baseUrl;
-      const feeds = config.bbc.categoryMap;
+      const baseUrl = bbcConfig.baseUrl;
+      const feeds = bbcConfig.categoryMap;
 
       let feedPath: string = feeds.general as string;
       if (filters?.category) {
