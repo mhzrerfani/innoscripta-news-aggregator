@@ -8,6 +8,9 @@ RUN npm ci
 
 COPY . .
 
+ARG GUARDIAN_API_KEY
+ARG NEWSAPI_KEY
+
 RUN npm run build
 
 
