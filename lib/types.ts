@@ -1,4 +1,4 @@
-import { Category, NewsSources } from "./config";
+import { categories, config } from "./config";
 
 export interface Article {
   title: string;
@@ -16,7 +16,7 @@ export interface NewsFilters {
   date?: string;
   page?: number;
   pageSize?: number;
-  source?: NewsSources;
+  source: NewsSources;
 }
 
 export interface NewsSource {
@@ -132,3 +132,11 @@ export interface BBCRssItem {
     "@_url": string;
   };
 }
+
+export type Config = typeof config;
+
+export type Category = (typeof categories)[number];
+
+export type CategoryMap<T> = Record<Category, T>;
+
+export type NewsSources = keyof typeof config.sources | "all";

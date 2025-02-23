@@ -46,14 +46,6 @@ export const newsApiSource: NewsSource = {
 
       params.append("domains", newsApiConfig.domains.join(","));
 
-      console.log("NewsAPI Request:", {
-        url: baseUrl,
-        params: params.toString(),
-        query: queryParts,
-        page: currentPage,
-        pageSize,
-      });
-
       const response = await fetch(`${baseUrl}?${params.toString()}`, {
         next: { revalidate: 300 },
         headers: {

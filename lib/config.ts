@@ -1,4 +1,5 @@
 import { env } from "./env";
+import { CategoryMap } from "./types";
 
 export const config = {
   sources: {
@@ -63,8 +64,6 @@ export const config = {
   isDevelopment: env.NODE_ENV === "development",
 } as const;
 
-export type Config = typeof config;
-
 export const categories = [
   "general",
   "business",
@@ -75,9 +74,3 @@ export const categories = [
   "technology",
   "world",
 ] as const;
-
-export type Category = (typeof categories)[number];
-
-type CategoryMap<T> = Record<Category, T>;
-
-export type NewsSources = keyof typeof config.sources

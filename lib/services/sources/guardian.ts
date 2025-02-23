@@ -1,4 +1,4 @@
-import { Category, config } from "@/lib/config";
+import { config } from "@/lib/config";
 import type { GuardianApiResponse, NewsFilters, NewsSource } from "@/lib/types";
 
 const guardianConfig = config.sources.guardian;
@@ -20,8 +20,7 @@ export const guardianSource: NewsSource = {
       }
 
       if (filters?.category) {
-        const category =
-          guardianConfig.categoryMap[filters.category as Category];
+        const category = guardianConfig.categoryMap[filters.category];
         if (category) {
           params.append("section", category);
         }

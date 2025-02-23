@@ -10,7 +10,6 @@ interface NewsResponse {
 }
 
 async function fetchNews(
-  source: string,
   filters?: NewsFilters,
   pageParam = 1,
 ): Promise<NewsResponse> {
@@ -32,14 +31,9 @@ async function fetchNews(
     params.set("page", pageParam.toString());
     params.set("pageSize", "12");
 
-    console.log("Fetching news:", {
-      source,
-      filters,
-      pageParam,
-      url: `/api/news/${source}?${params.toString()}`,
-    });
-
-    const response = await fetch(`/api/news/${source}?${params.toString()}`);
+    const response = await fetch(
+      `/api/news/${filters?.source}?${params.toString()}`,
+    );
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -63,12 +57,11 @@ async function fetchNews(
 }
 
 export function useInfiniteNews(
-  source: string,
   filters?: Omit<NewsFilters, "page" | "pageSize">,
 ) {
   return useInfiniteQuery({
-    queryKey: ["news", source, filters],
-    queryFn: ({ pageParam }) => fetchNews(source, filters, pageParam),
+    queryKey: ["news", filters?.source, filters?.category, filters?.query],
+    queryFn: ({ pageParam }) => fetchNews(filters, pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage, _, lastPageParam) =>
       lastPage.hasMore ? lastPageParam + 1 : undefined,

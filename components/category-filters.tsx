@@ -16,7 +16,7 @@ import {
   Globe,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { Category } from "@/lib/config";
+import { Category } from "@/lib/types";
 
 export const availableCategories: Array<{ name: Category; icon: LucideIcon }> =
   [

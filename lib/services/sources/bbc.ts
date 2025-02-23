@@ -1,6 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 import type { NewsFilters, NewsSource, RSSFeed } from "@/lib/types";
-import { Category, config } from "@/lib/config";
+import { config } from "@/lib/config";
 
 const bbcConfig = config.sources.bbc;
 
@@ -15,7 +15,7 @@ export const bbcSource: NewsSource = {
 
       let feedPath: string = feeds.general as string;
       if (filters?.category) {
-        const category = filters.category as Category;
+        const category = filters.category;
 
         if (feeds[category]) {
           feedPath = feeds[category];

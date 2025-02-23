@@ -7,17 +7,17 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import { useInfiniteNews } from "@/hooks/use-news";
 import { InfiniteScroll } from "./infinite-scroll";
-import type { NewsFilters } from "@/lib/types";
+import type { Category, NewsFilters, NewsSources } from "@/lib/types";
 import { useSearchParams } from "next/navigation";
-import { Category } from "@/lib/config";
 
-function NewsContent({ source }: { source: string }) {
+function NewsContent({ source }: { source: NewsSources }) {
   const searchParams = useSearchParams();
 
   const filters: NewsFilters = {
     query: searchParams.get("q") || undefined,
     category: (searchParams.get("category") as Category) ?? undefined,
     date: searchParams.get("date") || undefined,
+    source,
   };
 
   const {
@@ -27,7 +27,7 @@ function NewsContent({ source }: { source: string }) {
     isFetchingNextPage,
     isLoading,
     isError,
-  } = useInfiniteNews(source, filters);
+  } = useInfiniteNews(filters);
 
   if (isLoading) {
     return <NewsGridSkeleton />;
@@ -83,7 +83,7 @@ function NewsContent({ source }: { source: string }) {
   );
 }
 
-export default function NewsGrid({ source }: { source: string }) {
+export default function NewsGrid({ source }: { source: NewsSources }) {
   return (
     <Suspense fallback={<NewsGridSkeleton />}>
       <NewsContent source={source} />

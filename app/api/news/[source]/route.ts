@@ -1,11 +1,10 @@
 import type { NextRequest } from "next/server";
 import { newsService } from "@/lib/services/news-service";
-import type { NewsFilters } from "@/lib/types";
-import { Category } from "@/lib/config";
+import type { NewsFilters, Category, NewsSources } from "@/lib/types";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { source: string } },
+  { params }: { params: { source: NewsSources } },
 ) {
   try {
     const { searchParams } = new URL(request.url);
@@ -15,10 +14,10 @@ export async function GET(
       date: searchParams.get("date") || undefined,
       page: Number.parseInt(searchParams.get("page") || "1"),
       pageSize: Number.parseInt(searchParams.get("pageSize") || "12"),
-      source: params.source !== "all" ? params.source : undefined,
+      source: params.source,
     };
 
-    const result = await newsService.getAllNews(filters);
+    const result = await newsService.getNews(filters);
     return Response.json(result);
   } catch (error) {
     console.error("Error in news API:", error);
