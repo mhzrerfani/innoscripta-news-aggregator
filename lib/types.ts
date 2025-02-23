@@ -1,4 +1,4 @@
-import { Category } from "./config";
+import { Category, NewsSources } from "./config";
 
 export interface Article {
   title: string;
@@ -16,8 +16,7 @@ export interface NewsFilters {
   date?: string;
   page?: number;
   pageSize?: number;
-  source?: string;
-  sources?: string[];
+  source?: NewsSources;
 }
 
 export interface NewsSource {

@@ -2,9 +2,10 @@ import type { Article, NewsFilters, NewsSource } from "@/lib/types";
 import { newsApiSource } from "./sources/newsapi";
 import { guardianSource } from "./sources/guardian";
 import { bbcSource } from "./sources/bbc";
+import { NewsSources } from "../config";
 
 export class NewsAggregatorService {
-  private sources: { [key: string]: NewsSource };
+  private sources: Record<NewsSources, NewsSource>;
 
   constructor() {
     this.sources = {
@@ -16,10 +17,12 @@ export class NewsAggregatorService {
 
   async getAllNews(filters?: NewsFilters) {
     try {
-      if (filters?.source && this.sources[filters.source]) {
-        const result = await this.sources[filters.source].fetchNews(filters);
+      const source = filters?.source ? this.sources[filters.source] : undefined;
+
+      if (source) {
+        const result = await source.fetchNews(filters);
         return {
-          articles: result.articles || [],
+          articles: result.articles,
           hasMore: result.hasMore,
           totalResults: result.totalResults,
         };

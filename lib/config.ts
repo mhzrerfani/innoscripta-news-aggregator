@@ -79,3 +79,5 @@ export const categories = [
 export type Category = (typeof categories)[number];
 
 type CategoryMap<T> = Record<Category, T>;
+
+export type NewsSources = keyof typeof config.sources
