@@ -7,7 +7,7 @@ import {
   ClubIcon as Football,
   Cpu,
   Globe,
-} from "lucide-react"
+} from "lucide-react";
 
 export const availableCategories = [
   { name: "General", icon: Newspaper },
@@ -18,5 +18,4 @@ export const availableCategories = [
   { name: "Sport", icon: Football },
   { name: "Technology", icon: Cpu },
   { name: "World", icon: Globe },
-] as const
-
+] as const;

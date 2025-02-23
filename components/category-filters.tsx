@@ -1,32 +1,35 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import { useQueryClient } from "@tanstack/react-query"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { availableCategories } from "@/lib/constants"
+import { Button } from "@/components/ui/button";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { availableCategories } from "@/lib/constants";
+import { Suspense } from "react";
 
-export function CategoryFilters() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const pathname = usePathname()
-  const queryClient = useQueryClient()
-  const currentCategory = searchParams.get("category")
+function CategoryFiltersSection() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const queryClient = useQueryClient();
+  const currentCategory = searchParams.get("category");
 
   const handleCategoryChange = (category: string) => {
-    const params = new URLSearchParams(searchParams)
+    const params = new URLSearchParams(searchParams);
 
-    if (category === currentCategory || (category === "General" && !currentCategory)) {
-      params.delete("category")
+    if (
+      category === currentCategory ||
+      (category === "General" && !currentCategory)
+    ) {
+      params.delete("category");
     } else {
-      params.set("category", category)
+      params.set("category", category);
     }
 
-    params.delete("page")
-
-    router.push(`${pathname}?${params.toString()}`)
-    queryClient.invalidateQueries({ queryKey: ["news"] })
-  }
+    params.delete("page");
+    router.push(`${pathname}?${params.toString()}`);
+    queryClient.invalidateQueries({ queryKey: ["news"] });
+  };
 
   return (
     <ScrollArea className="w-full whitespace-nowrap">
@@ -35,7 +38,10 @@ export function CategoryFilters() {
           <Button
             key={category.name}
             variant={
-              currentCategory === category.name || (!currentCategory && category.name === "General") ? "default" : "outline"
+              currentCategory === category.name ||
+              (!currentCategory && category.name === "General")
+                ? "default"
+                : "outline"
             }
             size="sm"
             onClick={() => handleCategoryChange(category.name)}
@@ -48,6 +54,13 @@ export function CategoryFilters() {
       </div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>
-  )
+  );
 }
 
+export default function CategoryFilters() {
+  return (
+    <Suspense>
+      <CategoryFiltersSection />
+    </Suspense>
+  );
+}

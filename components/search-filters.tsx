@@ -1,68 +1,74 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Search, Filter, Loader2, X } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Calendar } from "@/components/ui/calendar"
-import { useQueryClient } from "@tanstack/react-query"
-import { format } from "date-fns"
+import type React from "react";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Search, Filter, Loader2, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Calendar } from "@/components/ui/calendar";
+import { useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 
-export default function SearchFilters() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [isPending, setIsPending] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
-  const queryClient = useQueryClient()
+function SearchFiltersSection() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isPending, setIsPending] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const [date, setDate] = useState<Date | undefined>(() => {
-    const dateParam = searchParams.get("date")
-    return dateParam ? new Date(dateParam) : undefined
-  })
+    const dateParam = searchParams.get("date");
+    return dateParam ? new Date(dateParam) : undefined;
+  });
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsPending(true)
+    e.preventDefault();
+    setIsPending(true);
 
-    const formData = new FormData(e.currentTarget)
-    const params = new URLSearchParams(searchParams)
+    const formData = new FormData(e.currentTarget);
+    const params = new URLSearchParams(searchParams);
 
-    const searchQuery = formData.get("search")
+    const searchQuery = formData.get("search");
     if (searchQuery) {
-      params.set("q", searchQuery.toString())
+      params.set("q", searchQuery.toString());
     } else {
-      params.delete("q")
+      params.delete("q");
     }
 
     if (date) {
-      params.set("date", date.toISOString())
+      params.set("date", date.toISOString());
     } else {
-      params.delete("date")
+      params.delete("date");
     }
 
-    setIsOpen(false)
+    setIsOpen(false);
 
-    queryClient.invalidateQueries({ queryKey: ["news"] })
+    queryClient.invalidateQueries({ queryKey: ["news"] });
 
-    router.push(`/?${params.toString()}`)
-    setIsPending(false)
-  }
+    router.push(`/?${params.toString()}`);
+    setIsPending(false);
+  };
 
   const handleReset = () => {
-    setDate(undefined)
-    setIsPending(true)
-    const params = new URLSearchParams(searchParams)
-    params.delete("q")
-    params.delete("date")
-    router.push(`/?${params.toString()}`)
-    queryClient.invalidateQueries({ queryKey: ["news"] })
-    setIsPending(false)
-  }
+    setDate(undefined);
+    setIsPending(true);
+    const params = new URLSearchParams(searchParams);
+    params.delete("q");
+    params.delete("date");
+    router.push(`/?${params.toString()}`);
+    queryClient.invalidateQueries({ queryKey: ["news"] });
+    setIsPending(false);
+  };
 
-  const hasFilters = searchParams.get("q") || searchParams.get("date")
+  const hasFilters = searchParams.get("q") || searchParams.get("date");
 
   return (
     <form onSubmit={handleSearch} className="space-y-4">
@@ -82,9 +88,9 @@ export default function SearchFilters() {
               size="sm"
               className="absolute right-2 top-1/2 h-7 w-7 -translate-y-1/2 p-0"
               onClick={() => {
-                const params = new URLSearchParams(searchParams)
-                params.delete("q")
-                router.push(`/?${params.toString()}`)
+                const params = new URLSearchParams(searchParams);
+                params.delete("q");
+                router.push(`/?${params.toString()}`);
               }}
             >
               <X className="h-4 w-4" />
@@ -116,7 +122,9 @@ export default function SearchFilters() {
                   selected={date}
                   onSelect={setDate}
                   className="rounded-md border w-full max-w-[20rem]"
-                  disabled={(date) => date > new Date() || date < new Date("2000-01-01")}
+                  disabled={(date) =>
+                    date > new Date() || date < new Date("2000-01-01")
+                  }
                 />
               </div>
             </div>
@@ -126,12 +134,24 @@ export default function SearchFilters() {
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
         </Button>
         {hasFilters && (
-          <Button type="button" variant="outline" onClick={handleReset} disabled={isPending}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleReset}
+            disabled={isPending}
+          >
             Reset
           </Button>
         )}
       </div>
     </form>
-  )
+  );
 }
 
+export default function SearchFilters() {
+  return (
+    <Suspense>
+      <SearchFiltersSection />
+    </Suspense>
+  );
+}
