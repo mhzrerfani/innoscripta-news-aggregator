@@ -3,6 +3,12 @@ import SearchFilters from "@/components/search-filters";
 import { ThemeToggle } from "@/components/theme-toggle";
 import NewsTabs from "@/components/news-tabs";
 import CategoryFilters from "@/components/category-filters";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Innoscripta News Aggregator",
+  description: "A news aggregator that fetches news articles from various sources.",
+};
 
 export default function Home() {
   return (

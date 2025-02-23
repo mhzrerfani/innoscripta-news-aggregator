@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { newsService } from "@/lib/services/news-service";
 import type { NewsFilters } from "@/lib/types";
+import { Category } from "@/lib/config";
 
 export async function GET(
   request: NextRequest,
@@ -10,7 +11,7 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const filters: NewsFilters = {
       query: searchParams.get("q") || undefined,
-      category: searchParams.get("category") || undefined,
+      category: searchParams.get("category") as Category || undefined,
       date: searchParams.get("date") || undefined,
       page: Number.parseInt(searchParams.get("page") || "1"),
       pageSize: Number.parseInt(searchParams.get("pageSize") || "12"),

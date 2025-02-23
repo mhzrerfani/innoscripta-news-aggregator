@@ -9,13 +9,14 @@ import { useInfiniteNews } from "@/hooks/use-news";
 import { InfiniteScroll } from "./infinite-scroll";
 import type { NewsFilters } from "@/lib/types";
 import { useSearchParams } from "next/navigation";
+import { Category } from "@/lib/config";
 
 function NewsContent({ source }: { source: string }) {
   const searchParams = useSearchParams();
 
   const filters: NewsFilters = {
     query: searchParams.get("q") || undefined,
-    category: searchParams.get("category") ?? undefined,
+    category: (searchParams.get("category") as Category) ?? undefined,
     date: searchParams.get("date") || undefined,
   };
 

@@ -1,3 +1,4 @@
+import { config } from "@/lib/config";
 import type { NewsFilters, NewsApiResponse, NewsSource } from "@/lib/types";
 
 export const newsApiSource: NewsSource = {
@@ -10,13 +11,13 @@ export const newsApiSource: NewsSource = {
       const currentPage = filters?.page || 1;
 
       const params = new URLSearchParams({
-        apiKey: process.env.NEWSAPI_KEY || "",
-        language: "en",
+        apiKey: config.newsapi.key || "",
+        language: config.newsapi.language,
         pageSize: pageSize.toString(),
         page: currentPage.toString(),
       });
 
-      const baseUrl = "https://newsapi.org/v2/everything";
+      const baseUrl = `${config.newsapi.baseUrl}/everything`;
 
       const queryParts: string[] = [];
 
@@ -24,25 +25,11 @@ export const newsApiSource: NewsSource = {
         queryParts.push(`(${filters.query})`);
       }
 
-      if (filters?.category && filters.category !== "General") {
-        const categoryMap: { [key: string]: string[] } = {
-          Business: ["business", "economy", "market", "finance", "trade"],
-          Culture: ["entertainment", "movie", "music", "celebrity", "culture"],
-          Wellness: ["health", "medical", "medicine", "healthcare"],
-          Science: ["science", "research", "discovery", "space"],
-          Sport: ["sport", "sports", "game", "match", "tournament"],
-          Technology: ["tech", "technology", "digital", "software", "cyber"],
-          World: ["world", "international", "global", "foreign"],
-        };
-
-        const categoryKeywords = categoryMap[filters.category];
+      if (filters?.category) {
+        const categoryKeywords = config.newsapi.categoryMap[filters.category];
         if (categoryKeywords) {
           queryParts.push(`(${categoryKeywords.join(" OR ")})`);
         }
-      }
-
-      if (queryParts.length === 0) {
-        queryParts.push("(world OR news OR breaking)");
       }
 
       params.append("q", queryParts.join(" AND "));
@@ -57,17 +44,7 @@ export const newsApiSource: NewsSource = {
 
       params.append(
         "domains",
-        [
-          "reuters.com",
-          "bloomberg.com",
-          "businessinsider.com",
-          "techcrunch.com",
-          "theverge.com",
-          "wired.com",
-          "cnn.com",
-          "bbc.com",
-          "apnews.com",
-        ].join(","),
+        config.newsapi.domains.join(","),
       );
 
       console.log("NewsAPI Request:", {
@@ -110,7 +87,7 @@ export const newsApiSource: NewsSource = {
         throw new Error(`NewsAPI returned status: ${data.status}`);
       }
 
-      let articles = data.articles
+      const articles = data.articles
         .filter((article) => {
           if (!article.title || !article.description || !article.publishedAt) {
             return false;
@@ -124,18 +101,6 @@ export const newsApiSource: NewsSource = {
             }
           }
 
-          if (filters?.query) {
-            const searchLower = filters.query.toLowerCase();
-            const titleLower = article.title.toLowerCase();
-            const descLower = article.description.toLowerCase();
-            if (
-              !titleLower.includes(searchLower) &&
-              !descLower.includes(searchLower)
-            ) {
-              return false;
-            }
-          }
-
           return true;
         })
         .map((article) => ({
@@ -143,16 +108,11 @@ export const newsApiSource: NewsSource = {
           description: article.description,
           url: article.url,
           imageUrl:
-            article.urlToImage || "/placeholder.svg?height=400&width=600",
+            article.urlToImage,
           source: article.source.name || "NewsAPI",
           publishedAt: article.publishedAt,
           category: filters?.category,
         }));
-
-      articles = articles.sort(
-        (a, b) =>
-          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
-      );
 
       const totalResults = Math.min(data.totalResults, 100);
       const totalPages = Math.ceil(totalResults / pageSize);

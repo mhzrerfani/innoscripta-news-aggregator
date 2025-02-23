@@ -4,8 +4,31 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { availableCategories } from "@/lib/constants";
 import { Suspense } from "react";
+import {
+  Newspaper,
+  Briefcase,
+  Film,
+  Heart,
+  FlaskRoundIcon as Flask,
+  ClubIcon as Football,
+  Cpu,
+  Globe,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { Category } from "@/lib/config";
+
+export const availableCategories: Array<{ name: Category, icon: LucideIcon }> = [
+  { name: "general", icon: Newspaper },
+  { name: "business", icon: Briefcase },
+  { name: "culture", icon: Film },
+  { name: "wellness", icon: Heart },
+  { name: "science", icon: Flask },
+  { name: "sport", icon: Football },
+  { name: "technology", icon: Cpu },
+  { name: "world", icon: Globe },
+] as const;
+
 
 function CategoryFiltersSection() {
   const router = useRouter();
@@ -39,7 +62,7 @@ function CategoryFiltersSection() {
             key={category.name}
             variant={
               currentCategory === category.name ||
-              (!currentCategory && category.name === "General")
+                (!currentCategory && category.name === "general")
                 ? "default"
                 : "outline"
             }
@@ -48,7 +71,7 @@ function CategoryFiltersSection() {
             className="min-w-[80px]"
           >
             <category.icon className="h-4 w-4 mr-1" />
-            {category.name}
+            <span className="capitalize">{category.name}</span>
           </Button>
         ))}
       </div>

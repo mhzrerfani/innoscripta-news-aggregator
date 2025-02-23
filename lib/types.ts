@@ -1,3 +1,5 @@
+import { Category } from "./config";
+
 export interface Article {
   title: string;
   description: string;
@@ -10,7 +12,7 @@ export interface Article {
 
 export interface NewsFilters {
   query?: string;
-  category?: string;
+  category?: Category;
   date?: string;
   page?: number;
   pageSize?: number;

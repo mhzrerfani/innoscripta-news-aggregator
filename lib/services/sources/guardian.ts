@@ -1,3 +1,4 @@
+import { Category, config } from "@/lib/config";
 import type { GuardianApiResponse, NewsFilters, NewsSource } from "@/lib/types";
 
 export const guardianSource: NewsSource = {
@@ -7,7 +8,7 @@ export const guardianSource: NewsSource = {
   async fetchNews(filters?: NewsFilters) {
     try {
       const params = new URLSearchParams({
-        "api-key": process.env.GUARDIAN_API_KEY || "",
+        "api-key": config.guardian.key || "",
         "show-fields": "thumbnail,trailText",
         "page-size": "30",
       });
@@ -17,8 +18,8 @@ export const guardianSource: NewsSource = {
       }
 
       if (filters?.category) {
-        const category = filters.category.toLowerCase();
-        if (category !== "general") {
+        const category = config.guardian.categoryMap[filters.category as Category];
+        if (category) {
           params.append("section", category);
         }
       }
@@ -34,7 +35,7 @@ export const guardianSource: NewsSource = {
       }
 
       const response = await fetch(
-        `https://content.guardianapis.com/search?${params.toString()}`,
+        `${config.guardian.baseUrl}/search?${params.toString()}`,
         {
           next: { revalidate: 3600 },
         },
@@ -49,10 +50,10 @@ export const guardianSource: NewsSource = {
 
       const articles = data.response.results.map((article) => ({
         title: article.webTitle,
-        description: article.fields?.trailText || "",
+        description: article.fields?.trailText,
         url: article.webUrl,
         imageUrl:
-          article.fields?.thumbnail || "/placeholder.svg?height=400&width=600",
+          article.fields?.thumbnail,
         source: "The Guardian",
         publishedAt: article.webPublicationDate,
         category: article.sectionName,
