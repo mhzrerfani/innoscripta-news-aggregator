@@ -1,7 +1,7 @@
 import { Newspaper } from "lucide-react";
 import SearchFilters from "@/components/search-filters";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { NewsTabs } from "@/components/news-tabs";
+import NewsTabs from "@/components/news-tabs";
 import CategoryFilters from "@/components/category-filters";
 
 export default function Home() {

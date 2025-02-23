@@ -3,7 +3,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NewsGrid from "./news-grid";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { NewsTabs } from "@/components/news-tabs";
 import { Suspense } from "react";
 
 function NewsTabsSection() {
