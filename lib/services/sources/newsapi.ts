@@ -40,8 +40,8 @@ export const newsApiSource: NewsSource = {
       if (filters?.date) {
         const selectedDate = new Date(filters.date);
         const dateStr = selectedDate.toISOString().split("T")[0];
-        params.append("from", `${dateStr}T00:00:00Z`);
-        params.append("to", `${dateStr}T23:59:59Z`);
+        params.append("from", dateStr);
+        params.append("to", dateStr);
       }
 
       params.append("domains", newsApiConfig.domains.join(","));

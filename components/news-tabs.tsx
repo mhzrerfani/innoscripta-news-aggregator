@@ -42,12 +42,15 @@ function NewsTabsSection() {
       onValueChange={handleTabChange}
       className="mb-6"
     >
-      <TabsList className="overflow-x-auto">
-        {allSources.map((source) => (
-          <TabsTrigger key={source.id} value={source.id}>
-            {source.label}
-          </TabsTrigger>
-        ))}
+      <TabsList className="w-full sm:w-fit h-12 sm:h-9 overflow-x-auto">
+        <div className="w-full flex">
+          {allSources.map((source) => (
+            <TabsTrigger key={source.id} value={source.id}>
+              {source.label}
+            </TabsTrigger>
+          ))}
+        </div>
+
       </TabsList>
       {allSources.map((source) => (
         <TabsContent key={source.id} value={source.id}>

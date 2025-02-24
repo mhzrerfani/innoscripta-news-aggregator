@@ -16,6 +16,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
+import CategoryFilters from './category-filters';
 
 function SearchFiltersSection() {
   const router = useRouter();
@@ -105,11 +106,12 @@ function SearchFiltersSection() {
           )}
         </div>
         <div className="self-end flex gap-2 items-center">
+          <CategoryFilters className="sm:hidden" displayMode="select" />
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" className="gap-2">
                 <Filter className="h-4 w-4" />
-                Filters
+                <span className="sm:block hidden">Filters</span>
                 {date && (
                   <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
                     {format(date, "MMM d, yyyy")}
@@ -117,9 +119,9 @@ function SearchFiltersSection() {
                 )}
               </Button>
             </SheetTrigger>
-            <SheetContent>
+            <SheetContent className="w-[19rem]">
               <SheetHeader>
-                <SheetTitle>Search Filters</SheetTitle>
+                <SheetTitle className="text-left pt-5">Search Filters</SheetTitle>
               </SheetHeader>
               <form onSubmit={handleSearch} className="mt-4 space-y-4">
                 <div className="space-y-2">
@@ -128,7 +130,7 @@ function SearchFiltersSection() {
                     mode="single"
                     selected={date}
                     onSelect={setDate}
-                    className="rounded-md border w-full max-w-[20rem]"
+                    className="rounded-md border w-full"
                     disabled={(date) =>
                       date > new Date() || date < new Date("2000-01-01")
                     }

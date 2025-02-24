@@ -30,7 +30,7 @@ export default function Home() {
       <main className="container mx-auto min-h-[calc(100vh-73px)] px-4 py-6">
         <SearchFilters />
         <div className="mt-6">
-          <CategoryFilters />
+          <CategoryFilters className="hidden sm:block" displayMode="list" />
           <div className="mt-4">
             <NewsTabs />
           </div>

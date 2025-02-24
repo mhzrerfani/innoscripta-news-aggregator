@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, Tag } from "lucide-react";
+import { CalendarIcon, Tag, Newspaper } from 'lucide-react';
 
 interface Article {
   title: string;
@@ -24,10 +24,13 @@ export default function NewsCard({ article }: { article: Article }) {
       >
         <div className="relative h-48 w-full">
           <img
-            src={article.imageUrl || "/placeholder.svg?height=192&width=384"}
+            src={article.imageUrl}
             alt={article.title}
-            className="object-cover h-[192px] w-full"
+            className="object-cover h-full w-full z-20 relative"
           />
+          <div className="w-full h-full bg-muted flex items-center justify-center z-10 absolute top-0">
+            <Newspaper className="opacity-10 w-10 h-10" />
+          </div>
         </div>
         <CardHeader>
           <div className="flex flex-wrap items-center gap-2 mb-2">

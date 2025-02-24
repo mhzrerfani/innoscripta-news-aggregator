@@ -45,7 +45,7 @@ export const bbcSource: NewsSource = {
       });
       const data: RSSFeed = parser.parse(xml);
 
-      const articles = data.rss.channel.item.map((article) => {
+      let articles = data.rss.channel.item.map((article) => {
         const thumbnail = article["media:thumbnail"]?.["@_url"];
 
         return {
@@ -57,7 +57,28 @@ export const bbcSource: NewsSource = {
           publishedAt: article.pubDate,
           category: data.rss.channel.description.split(" - ")[1],
         };
-      });
+      })
+
+      if (filters?.query) {
+        const query = filters.query.toLowerCase();
+        articles = articles.filter(
+          (article) =>
+            article.title.toLowerCase().includes(query) ||
+            article.description.toLowerCase().includes(query),
+        );
+      }
+
+      if (filters?.date) {
+        const filterDate = new Date(filters.date).toDateString();
+        articles = articles.filter(
+          (article) =>
+            new Date(article.publishedAt).toDateString() === filterDate,
+        );
+      }
+
+      if (!Array.isArray(articles)) {
+        articles = [articles].filter(Boolean);
+      }
 
       return {
         articles,
