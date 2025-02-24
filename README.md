@@ -33,13 +33,11 @@ To containerize and run the frontend application using Docker:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/mhzrerfani/news-aggregator.git
-cd news-aggregator
+git clone https://github.com/mhzrerfani/innoscripta-news-aggregator.git
+cd innoscripta-news-aggregator
 ```
 
 2. Create a `.env.local` file with your API keys. Optionally, you can copy the `.env.example` file and rename it to `.env.local`:
-
-**NOTE:** If you use the pre-built image, API keys are provided for easier testing and you can skip providing your own API keys.
 
 ```plaintext
 NEWSAPI_KEY=your_newsapi_key
@@ -49,13 +47,13 @@ GUARDIAN_API_KEY=your_guardian_key
 3. Build the Docker image, or use the pre-built image from `ghcr.io/mhzrerfani/innoscripta-news-aggregator`:
 
 ```bash
-docker build -t news-aggregator .
+docker build -t innoscripta-news-aggregator .
 ```
 
 4. Run the Docker container:
 
 ```bash
-docker run -p 3000:3000 --env-file .env.local ghcr.io/mhzrerfani/innoscripta-news-aggregator:main
+docker run --rm -p 3000:3000 --env-file .env.local ghcr.io/mhzrerfani/innoscripta-news-aggregator:main
 ```
 
 This will start the application in a Docker container and make it accessible at `http://localhost:3000`.
