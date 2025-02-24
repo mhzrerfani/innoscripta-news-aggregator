@@ -44,16 +44,19 @@ NEWSAPI_KEY=your_newsapi_key
 GUARDIAN_API_KEY=your_guardian_key
 ```
 
-3. Build the Docker image, or use the pre-built image from `ghcr.io/mhzrerfani/innoscripta-news-aggregator`:
+3. Build and run the Docker container:
 
-```bash
-docker build -t innoscripta-news-aggregator .
-```
-
-4. Run the Docker container:
+- Using pre-built image
 
 ```bash
 docker run --rm -p 3000:3000 --env-file .env.local ghcr.io/mhzrerfani/innoscripta-news-aggregator:main
+```
+
+- Building locally
+
+```bash
+docker build -t innoscripta-news-aggregator .
+docker run --rm -p 3000:3000 --env-file .env.local innoscripta-news-aggregator
 ```
 
 This will start the application in a Docker container and make it accessible at `http://localhost:3000`.
@@ -98,8 +101,8 @@ The Guardian API gets sent to the email once you register.
 
 ## API Limitations
 
-| Source       | Free Tier Limits                          |
-| ------------ | ----------------------------------------- |
-| NewsAPI      | 100 requests/day, max 5 pages per request |
-| The Guardian | 500 requests/day                          |
-| BBC News     | No limit (RSS feed)                       |
+| Source       | Free Tier Limits                           |
+| ------------ | ------------------------------------------ |
+| NewsAPI      | 1000 requests/day, max 5 pages per request |
+| The Guardian | 500 requests/day                           |
+| BBC News     | No limit (RSS feed)                        |
