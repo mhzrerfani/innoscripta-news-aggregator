@@ -70,5 +70,6 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
   }
 }
