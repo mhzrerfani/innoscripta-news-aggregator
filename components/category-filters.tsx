@@ -16,12 +16,17 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Category } from "@/lib/types";
-import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 type CategoryFiltersProps = {
   displayMode: "list" | "select";
-  className?: string
+  className?: string;
 };
 
 export const availableCategories: Array<{ name: Category; icon: LucideIcon }> =
@@ -36,7 +41,10 @@ export const availableCategories: Array<{ name: Category; icon: LucideIcon }> =
     { name: "world", icon: Globe },
   ] as const;
 
-function CategoryFiltersSection({ displayMode, className }: CategoryFiltersProps) {
+function CategoryFiltersSection({
+  displayMode,
+  className,
+}: CategoryFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -69,7 +77,7 @@ function CategoryFiltersSection({ displayMode, className }: CategoryFiltersProps
               key={category.name}
               variant={
                 currentCategory === category.name ||
-                  (!currentCategory && category.name === "general")
+                (!currentCategory && category.name === "general")
                   ? "default"
                   : "outline"
               }
@@ -83,9 +91,14 @@ function CategoryFiltersSection({ displayMode, className }: CategoryFiltersProps
           ))}
         </div>
       ) : (
-        <Select onValueChange={handleCategoryChange} defaultValue={currentCategory || "general"}>
+        <Select
+          onValueChange={handleCategoryChange}
+          defaultValue={currentCategory || "general"}
+        >
           <SelectTrigger className="w-full">
-            <span className="capitalize pr-2">{currentCategory || "general"}</span>
+            <span className="capitalize pr-2">
+              {currentCategory || "general"}
+            </span>
           </SelectTrigger>
           <SelectContent>
             {availableCategories.map((category) => (
@@ -103,7 +116,10 @@ function CategoryFiltersSection({ displayMode, className }: CategoryFiltersProps
   );
 }
 
-export default function CategoryFilters({ displayMode, className }: CategoryFiltersProps) {
+export default function CategoryFilters({
+  displayMode,
+  className,
+}: CategoryFiltersProps) {
   return (
     <Suspense>
       <CategoryFiltersSection displayMode={displayMode} className={className} />

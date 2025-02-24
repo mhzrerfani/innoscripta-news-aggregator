@@ -57,7 +57,7 @@ export const bbcSource: NewsSource = {
           publishedAt: article.pubDate,
           category: data.rss.channel.description.split(" - ")[1],
         };
-      })
+      });
 
       if (filters?.query) {
         const query = filters.query.toLowerCase();

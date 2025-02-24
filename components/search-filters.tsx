@@ -16,7 +16,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import CategoryFilters from './category-filters';
+import CategoryFilters from "./category-filters";
 
 function SearchFiltersSection() {
   const router = useRouter();
@@ -113,15 +113,20 @@ function SearchFiltersSection() {
                 <Filter className="h-4 w-4" />
                 <span className="sm:block hidden">Filters</span>
                 {date && (
-                  <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                    {format(date, "MMM d, yyyy")}
-                  </span>
+                  <>
+                    <span className="ml-1 sm:block hidden rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
+                      {format(date, "MMM d, yyyy")}
+                    </span>
+                    <span className="sm:hidden">•</span>
+                  </>
                 )}
               </Button>
             </SheetTrigger>
             <SheetContent className="w-[19rem]">
               <SheetHeader>
-                <SheetTitle className="text-left pt-5">Search Filters</SheetTitle>
+                <SheetTitle className="text-left pt-5">
+                  Search Filters
+                </SheetTitle>
               </SheetHeader>
               <form onSubmit={handleSearch} className="mt-4 space-y-4">
                 <div className="space-y-2">
@@ -136,28 +141,35 @@ function SearchFiltersSection() {
                     }
                   />
                 </div>
-                {date && <div className="flex gap-2">
-                  <Button type="submit" disabled={isPending} >
-                    {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
-                  </Button>
+                {date && (
+                  <div className="flex gap-2">
+                    <Button type="submit" disabled={isPending}>
+                      {isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Search"
+                      )}
+                    </Button>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={resetDate}
-                    disabled={isPending}
-                  >
-                    Reset
-                  </Button>
-                </div>
-                }
-
-
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={resetDate}
+                      disabled={isPending}
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                )}
               </form>
             </SheetContent>
           </Sheet>
           <Button size={"sm"} type="submit" disabled={isPending}>
-            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
+            {isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Search"
+            )}
           </Button>
           {hasFilters && (
             <Button
@@ -171,7 +183,6 @@ function SearchFiltersSection() {
             </Button>
           )}
         </div>
-
       </div>
     </form>
   );

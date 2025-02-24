@@ -19,10 +19,9 @@ export const guardianSource: NewsSource = {
         params.append("q", filters.query);
       }
 
-      if (filters?.category && filters?.category !== 'general') {
+      if (filters?.category && filters?.category !== "general") {
         const category = guardianConfig.categoryMap[filters.category];
         params.append("section", category);
-
       }
 
       if (filters?.date) {

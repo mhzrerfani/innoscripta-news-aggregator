@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, Tag, Newspaper } from 'lucide-react';
+import { CalendarIcon, Tag, Newspaper } from "lucide-react";
 
 interface Article {
   title: string;
@@ -44,7 +44,9 @@ export default function NewsCard({ article }: { article: Article }) {
           </div>
           <div className="flex items-center text-sm text-muted-foreground mb-2">
             <CalendarIcon className="mr-1 h-4 w-4" />
-            {new Date(article.publishedAt).toLocaleDateString("en-US", { timeZone: "UTC" })}
+            {new Date(article.publishedAt).toLocaleDateString("en-US", {
+              timeZone: "UTC",
+            })}
           </div>
           <CardTitle className="line-clamp-2">{article.title}</CardTitle>
         </CardHeader>
